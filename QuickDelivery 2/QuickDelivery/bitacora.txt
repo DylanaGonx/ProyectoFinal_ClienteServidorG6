@@ -1,0 +1,2 @@
+2026-08-09 16:26:35 | admin | LOGIN | Seguridad | Inicio de sesion del usuario admin
+2026-08-09 16:27:15 | admin | LOGOUT | Seguridad | Cierre de sesion del usuario admin
