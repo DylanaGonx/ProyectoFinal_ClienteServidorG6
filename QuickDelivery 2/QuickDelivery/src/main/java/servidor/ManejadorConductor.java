@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import model.EstadoPaquete;
+import model.Monitoreable;
 import model.Paquete;
 import model.Usuario;
 import model.Vehiculo;
@@ -25,7 +26,10 @@ import service.GestorUsuarios;
 import service.GestorVehiculos;
 
 /**
- * Hilo que atiende a un conductor conectado.
+ * Tarea que atiende a un conductor conectado.
+ *
+ * Implementa Runnable para poder entregarsela al ExecutorService del servidor,
+ * que es el que se encarga de repartir los hilos del grupo.
  *
  * Protocolo de mensajes (todos los campos van separados por punto y coma):
  *
@@ -41,7 +45,7 @@ import service.GestorVehiculos;
  *
  * @author Grupo 6
  */
-public class ManejadorConductor extends Thread {
+public class ManejadorConductor implements Runnable {
 
     private String placa;
     private Socket socket;
@@ -50,6 +54,13 @@ public class ManejadorConductor extends Thread {
 
     // Id del usuario conductor, se usa para la auditoria
     private int idConductor;
+
+    /*
+     * El vehiculo que atiende este hilo, visto como Monitoreable. Se guarda con
+     * el tipo de la interfaz y no con el de la clase concreta, para que al hilo
+     * le de igual si es una moto, un camion o un furgon.
+     */
+    private Monitoreable vehiculoMonitoreado;
 
     /*
      * Flota conectada, compartida por todos los hilos del servidor.
@@ -139,6 +150,9 @@ public class ManejadorConductor extends Thread {
 
             placa = placaRecibida;
 
+            //Se guarda como Monitoreable: polimorfismo por interfaz
+            vehiculoMonitoreado = vehiculo;
+
             int enLinea = flotaConectada.size();
 
             buscarIdConductor(vehiculo);
@@ -204,7 +218,13 @@ public class ManejadorConductor extends Thread {
 
             gestorUbicaciones.registrarUbicacion(placa, latitud, longitud, "En ruta");
 
-            System.out.println("[" + placa + "] posicion " + latitud + ", " + longitud);
+            /*
+             * Se actualiza el objeto a traves de la interfaz. El hilo no sabe
+             * ni le importa que subclase de Vehiculo es.
+             */
+            vehiculoMonitoreado.actualizarUbicacion(latitud, longitud);
+
+            System.out.println("[" + placa + "] " + vehiculoMonitoreado.obtenerEstado());
 
             out.writeUTF("OK;Ubicacion registrada");
 
@@ -257,6 +277,7 @@ public class ManejadorConductor extends Thread {
     }
 
     // INCIDENCIA;idPaquete;tipo;descripcion  (HU-07)
+    // INCIDENCIA;idPaquete;tipo;descripcion;latitud;longitud
     private void procesarIncidencia(String mensaje) throws IOException {
 
         String datos[] = mensaje.split(";");
@@ -270,12 +291,32 @@ public class ManejadorConductor extends Thread {
 
             int idPaquete = Integer.parseInt(datos[1]);
 
-            gestorIncidencias.registrarIncidencia(idPaquete, placa, datos[2], datos[3]);
+            /*
+             * La posicion es opcional en el protocolo: si el cliente la manda
+             * (datos[4] y datos[5]) se guarda con la incidencia, para que el
+             * despachador sepa donde ocurrio. Si no viene, queda nula.
+             */
+            Double latitud = null;
+            Double longitud = null;
 
-            System.out.println("[" + placa + "] incidencia en el paquete " + idPaquete + ": " + datos[3]);
+            if (datos.length >= 6) {
+                try {
+                    latitud = Double.parseDouble(datos[4]);
+                    longitud = Double.parseDouble(datos[5]);
+                } catch (NumberFormatException ex) {
+                    // La ubicacion vino con datos raros, se guarda la incidencia igual pero sin ubicacion
+                    latitud = null;
+                    longitud = null;
+                }
+            }
+
+            gestorIncidencias.registrarIncidencia(idPaquete, placa, datos[2], datos[3], latitud, longitud);
+
+            String detalleUbicacion = (latitud != null) ? " en " + latitud + ", " + longitud : "";
+            System.out.println("[" + placa + "] incidencia en el paquete " + idPaquete + ": " + datos[3] + detalleUbicacion);
 
             gestorAuditoria.registrar(idConductor, "vehiculo " + placa, "INCIDENCIA", "Entregas",
-                    "Incidencia en el paquete " + idPaquete + ": " + datos[3]);
+                    "Incidencia en el paquete " + idPaquete + ": " + datos[3] + detalleUbicacion);
 
             out.writeUTF("OK;Incidencia registrada");
 

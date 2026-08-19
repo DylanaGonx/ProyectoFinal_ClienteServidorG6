@@ -395,10 +395,21 @@
           <SubComponents>
             <Component class="javax.swing.JButton" name="btnRegistrarVehiculo">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Registrar Vehículo"/>
+                <Property name="text" type="java.lang.String" value="Gestionar Vehículos"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRegistrarVehiculoActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="btnGestionarUsuarios">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Gestionar Usuarios"/>
+                <Property name="focusable" type="boolean" value="false"/>
+                <Property name="horizontalTextPosition" type="int" value="0"/>
+                <Property name="verticalTextPosition" type="int" value="3"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnGestionarUsuariosActionPerformed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btnRegistrarPaquete">

@@ -1,18 +1,27 @@
-# Credenciales
-UsuariosContraseña.txt
-
-# Archivos de datos generados
-*.dat
-
-# Archivos compilados de Java
-*.class
-
-# Carpetas generadas por Maven
+# Maven
 target/
 
-# Carpetas de compilación de NetBeans
-build/
-dist/
-nbbuild/
-nbdist/
-.nb-gradle/
+# NetBeans / IDEs
+nbproject/private/
+nbactions.xml
+nb-configuration.xml
+.idea/
+*.iml
+.settings/
+.classpath
+.project
+
+# Compilados Java
+*.class
+*.jar
+*.war
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Archivos que genera la aplicacion al correr (auditoria y configuracion)
+bitacora.txt
+bitacora.dat
+configuracion.dat

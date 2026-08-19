@@ -7,6 +7,7 @@ package service;
 import dao.UbicacionDAO;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * Logica de negocio del rastreo de vehiculos (RF-12).
@@ -27,6 +28,11 @@ public class GestorUbicaciones {
 
     public String obtenerUltimaUbicacion(String placa) throws SQLException {
         return ubicacionDAO.obtenerUltimaUbicacion(placa);
+    }
+
+    //Ubicacion de todos los vehiculos que estan en ruta, para el monitor del backoffice
+    public ArrayList<String> obtenerUbicacionesFlota() throws SQLException {
+        return ubicacionDAO.listarUbicacionesEnRuta();
     }
 
 }

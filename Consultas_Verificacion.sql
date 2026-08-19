@@ -1,6 +1,6 @@
 -- Consultas_Verificacion
 -- QuickDelivery S.A. - Grupo 6 MN
--- Estas consultas sirven para comprobar que lo que se registra desde la
+-- Estas consultas sirven para comprobar que lo que se registra desde la APP
 
 USE quick_delivery;
 

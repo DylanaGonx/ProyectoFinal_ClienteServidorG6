@@ -36,16 +36,6 @@ CREATE TABLE IF NOT EXISTS usuarios (
         ON UPDATE CASCADE
     );
 
--- tabla administradores (especializacion de usuarios)
-CREATE TABLE IF NOT EXISTS administradores (
-	id_usuario INT PRIMARY KEY,
-    nivel INT NOT NULL,
-    CONSTRAINT fk_administradores_usuario
-		FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
-        ON DELETE RESTRICT
-        ON UPDATE CASCADE
-    );
-
 -- tabla conductores (especializacion de usuarios)
 CREATE TABLE IF NOT EXISTS conductores (
 	id_usuario INT PRIMARY KEY,
@@ -68,6 +58,8 @@ CREATE TABLE IF NOT EXISTS despachadores (
     );
 
 -- tabla tipos_vehiculo
+-- Aqui se maneja si el vehiculo es moto, auto, camion o furgon. No hay una
+-- tabla por cada tipo: el tipo es un dato, no una entidad aparte.
 -- El nombre del tipo es el mismo que devuelve el metodo getTipo() de cada
 -- subclase de model.Vehiculo, por eso dice Automovil y no Auto.
 CREATE TABLE IF NOT EXISTS tipos_vehiculo (
@@ -103,36 +95,6 @@ CREATE TABLE IF NOT EXISTS vehiculos (
 	CONSTRAINT fk_vehiculos_conductor
 		FOREIGN KEY (id_conductor) REFERENCES conductores(id_usuario)
         ON DELETE SET NULL
-        ON UPDATE CASCADE
-    );
-
--- tabla autos (especializacion de vehiculos)
-CREATE TABLE IF NOT EXISTS autos (
-	id_vehiculo INT PRIMARY KEY,
-    num_puertas INT NOT NULL,
-    CONSTRAINT fk_autos_vehiculo
-		FOREIGN KEY (id_vehiculo) REFERENCES vehiculos(id_vehiculo)
-        ON DELETE RESTRICT
-        ON UPDATE CASCADE
-    );
-
--- tabla camiones (especializacion de vehiculos)
-CREATE TABLE IF NOT EXISTS camiones (
-	id_vehiculo INT PRIMARY KEY,
-    toneladas DECIMAL(8,2) NOT NULL,
-    CONSTRAINT fk_camiones_vehiculo
-		FOREIGN KEY (id_vehiculo) REFERENCES vehiculos(id_vehiculo)
-        ON DELETE RESTRICT
-        ON UPDATE CASCADE
-    );
-
--- tabla motos (especializacion de vehiculos)
-CREATE TABLE IF NOT EXISTS motos (
-	id_vehiculo INT PRIMARY KEY,
-    caja_lateral BOOLEAN DEFAULT FALSE,
-    CONSTRAINT fk_motos_vehiculo
-		FOREIGN KEY (id_vehiculo) REFERENCES vehiculos(id_vehiculo)
-        ON DELETE RESTRICT
         ON UPDATE CASCADE
     );
 
@@ -244,6 +206,8 @@ CREATE TABLE IF NOT EXISTS incidencias (
     id_conductor INT NOT NULL,
     id_tipo_incidencia INT NOT NULL,
     descripcion VARCHAR(255),
+    latitud DECIMAL(10,7) NULL,
+    longitud DECIMAL(10,7) NULL,
     fecha DATETIME,
     CONSTRAINT fk_incidencias_paquete
 		FOREIGN KEY (id_paquete) REFERENCES paquetes(id_paquete)
@@ -309,9 +273,9 @@ INSERT INTO usuarios (id_rol, usuario, contrasena_hash, intentos, activo)
 VALUES (2, 'cond2', '1234', 0, TRUE);
 
 -- especializaciones de usuarios
-
-INSERT INTO administradores (id_usuario, nivel)
-VALUES (1, 1);
+-- El administrador no lleva tabla aparte: ser administrador es un rol, y el rol
+-- ya esta en la tabla roles. Conductores y despachadores si llevan tabla porque
+-- guardan datos propios (licencia, telefono, zona).
 
 INSERT INTO conductores (id_usuario, licencia, telefono)
 VALUES (2, 'B1-123456', '8888-8888');
@@ -349,14 +313,6 @@ VALUES (1, 1, 2, 'CRC-001', 500.00, TRUE);
 
 INSERT INTO vehiculos (id_tipo_vehiculo, id_estado_vehiculo, id_conductor, placa, capacidad_kg, activo)
 VALUES (3, 1, 4, 'MOT-045', 30.00, TRUE);
-
--- especializaciones de vehiculos
-
-INSERT INTO autos (id_vehiculo, num_puertas)
-VALUES (1, 4);
-
-INSERT INTO motos (id_vehiculo, caja_lateral)
-VALUES (2, TRUE);
 
 -- estados de paquete
 

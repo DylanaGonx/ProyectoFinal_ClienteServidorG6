@@ -27,6 +27,9 @@ import service.GestorConfiguracion;
  */
 public class ClienteVehiculo extends javax.swing.JFrame {
 
+    // Cada cuanto se reintenta la conexion si el servidor no responde (RFN-09)
+    private static final int REINTENTO_CONEXION = 5000;
+
     /*
      * La direccion del servidor, el puerto y cada cuanto se reporta la
      * ubicacion salen del archivo configuracion.dat, que se lee con
@@ -266,17 +269,53 @@ public class ClienteVehiculo extends javax.swing.JFrame {
     /*
      * Se conecta al servidor y se queda leyendo lo que llegue. Este metodo se
      * ejecuta en un hilo aparte para no congelar la ventana.
+     *
+     * RFN-09: si el servidor esta caido o la conexion se corta, el cliente no
+     * se queda ahi parado. Vuelve a intentar solo, cada REINTENTO_CONEXION
+     * milisegundos, hasta lograr conectarse.
      */
     public void conectar() {
 
+        while (true) {
+
+            try {
+
+                Socket socket = new Socket(configuracion.getServidor(), configuracion.getPuerto());
+
+                in = new DataInputStream(socket.getInputStream());
+                out = new DataOutputStream(socket.getOutputStream());
+
+                anotar("Conectado al servidor " + configuracion.getServidor() + ":" + configuracion.getPuerto());
+
+                atenderSesion();
+
+            } catch (IOException ex) {
+
+                conectado = false;
+                habilitarControles(false);
+                lblEstadoConexion.setText("Sin conexion, reintentando...");
+                anotar("No se pudo conectar o se perdio la conexion: " + ex.getLocalizedMessage());
+
+                esperarReintento();
+            }
+        }
+    }
+
+    //Cuenta atras antes de volver a intentar la conexion
+    private void esperarReintento() {
         try {
+            Thread.sleep(REINTENTO_CONEXION);
+        } catch (InterruptedException ex) {
+            anotar("Reintento de conexion interrumpido: " + ex.getLocalizedMessage());
+        }
+    }
 
-            Socket socket = new Socket(configuracion.getServidor(), configuracion.getPuerto());
-
-            in = new DataInputStream(socket.getInputStream());
-            out = new DataOutputStream(socket.getOutputStream());
-
-            anotar("Conectado al servidor " + configuracion.getServidor() + ":" + configuracion.getPuerto());
+    /*
+     * Atiende una sesion mientras el socket este vivo. Si el servidor se cae
+     * a media sesion, in.readUTF() lanza IOException y conectar() vuelve a
+     * intentar desde cero.
+     */
+    private void atenderSesion() throws IOException {
 
             while (true) {
 
@@ -332,13 +371,6 @@ public class ClienteVehiculo extends javax.swing.JFrame {
                     anotar("Error: " + mensaje.substring(6));
                 }
             }
-
-        } catch (IOException ex) {
-            conectado = false;
-            habilitarControles(false);
-            lblEstadoConexion.setText("Se perdio la conexion");
-            anotar("Se perdio la conexion con el servidor: " + ex.getLocalizedMessage());
-        }
     }
 
     /*
@@ -417,8 +449,13 @@ public class ClienteVehiculo extends javax.swing.JFrame {
             // El punto y coma es el separador del protocolo, se quita
             descripcion = descripcion.replace(";", ",");
 
+            /*
+             * Se manda la posicion actual del vehiculo junto con la
+             * incidencia, para que el despachador sepa donde ocurrio.
+             */
             escribir("INCIDENCIA;" + idPaquete + ";"
-                    + cbTipoIncidencia.getSelectedItem().toString() + ";" + descripcion);
+                    + cbTipoIncidencia.getSelectedItem().toString() + ";" + descripcion
+                    + ";" + latitud + ";" + longitud);
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "El numero del paquete tiene que ser numerico.");
@@ -451,24 +488,6 @@ public class ClienteVehiculo extends javax.swing.JFrame {
         btnEstado.setEnabled(activo);
         btnIncidencia.setEnabled(activo);
         btnActualizar.setEnabled(activo);
-    }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-
-                ClienteVehiculo clienteVehiculo = new ClienteVehiculo();
-                clienteVehiculo.setVisible(true);
-
-                // La conexion corre en su propio hilo, igual que en el ejemplo
-                // del chat visto en clase
-                new Thread(() -> clienteVehiculo.conectar()).start();
-            }
-        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
