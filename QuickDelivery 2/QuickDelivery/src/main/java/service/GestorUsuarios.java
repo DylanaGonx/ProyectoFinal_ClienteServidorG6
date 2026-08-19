@@ -3,100 +3,76 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package service;
+
+import dao.UsuarioDAO;
 import exceptions.UsuarioDuplicadoException;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
+
 import model.Usuario;
 
 /**
+ * Logica de negocio de los usuarios. La informacion se guarda en la base de
+ * datos por medio de UsuarioDAO.
  *
  * @author Valeria
  */
-
 public class GestorUsuarios {
 
-    // Lista de usuarios registrados
-    private ArrayList<Usuario> listaUsuarios;
+    private UsuarioDAO usuarioDAO;
 
     // Constructor
     public GestorUsuarios() {
-        listaUsuarios = new ArrayList<>();
+        usuarioDAO = new UsuarioDAO();
     }
 
     // Agrega un usuario
-    public void agregarUsuario(Usuario usuario) throws UsuarioDuplicadoException {
+    public void agregarUsuario(Usuario usuario) throws UsuarioDuplicadoException, SQLException {
 
         // Revisa si el usuario ya existe
-        for (Usuario u : listaUsuarios) {
-
-            if (u.getUsuario().equalsIgnoreCase(usuario.getUsuario())) {
-
-                throw new UsuarioDuplicadoException("Ya existe un usuario con ese nombre.");
-
-            }
-
+        if (usuarioDAO.obtenerPorUsuario(usuario.getUsuario()) != null) {
+            throw new UsuarioDuplicadoException("Ya existe un usuario con ese nombre.");
         }
 
-        listaUsuarios.add(usuario);
-
+        usuarioDAO.insertar(usuario);
     }
 
     // Obtiene todos los usuarios
-    public ArrayList<Usuario> obtenerUsuarios() {
+    public ArrayList<Usuario> obtenerUsuarios() throws SQLException {
+        return usuarioDAO.listarTodos();
+    }
 
-        return listaUsuarios;
-
+    // Obtiene unicamente los usuarios con rol de conductor
+    public ArrayList<Usuario> obtenerConductores() throws SQLException {
+        return usuarioDAO.listarConductores();
     }
 
     // Busca un usuario por su nombre de usuario
-    public Usuario buscarUsuario(String usuario) {
-
-        for (Usuario u : listaUsuarios) {
-
-            if (u.getUsuario().equalsIgnoreCase(usuario)) {
-
-                return u;
-
-            }
-
-        }
-
-        return null;
-
+    public Usuario buscarUsuario(String usuario) throws SQLException {
+        return usuarioDAO.obtenerPorUsuario(usuario);
     }
 
     // Elimina un usuario
-    public boolean eliminarUsuario(String usuario) {
+    public boolean eliminarUsuario(String usuario) throws SQLException {
 
-        Usuario encontrado = buscarUsuario(usuario);
-
-        if (encontrado != null) {
-
-            listaUsuarios.remove(encontrado);
-            return true;
-
+        if (usuarioDAO.obtenerPorUsuario(usuario) == null) {
+            return false;
         }
 
-        return false;
-
+        usuarioDAO.eliminar(usuario);
+        return true;
     }
 
     // Modifica un usuario
-    public boolean modificarUsuario(Usuario nuevoUsuario) {
+    public boolean modificarUsuario(Usuario nuevoUsuario) throws SQLException {
 
-        Usuario usuario = buscarUsuario(nuevoUsuario.getUsuario());
-
-        if (usuario != null) {
-
-            usuario.setContrasenia(nuevoUsuario.getContrasenia());
-            usuario.setrol(nuevoUsuario.getrol());
-
-            return true;
-
+        if (usuarioDAO.obtenerPorUsuario(nuevoUsuario.getUsuario()) == null) {
+            return false;
         }
 
-        return false;
-
+        usuarioDAO.actualizar(nuevoUsuario);
+        return true;
     }
 
 }
-

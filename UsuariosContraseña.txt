@@ -1,3 +1,8 @@
-Usuario: admin | Contraseña: 1234
-Usuario: desp | Contraseña: 1234
-Usuario: cond | Contraseña: 1234
+Usuarios registrados en la tabla usuarios de la base quick_delivery
+
+Usuario: admin | Contraseña: 1234 | Rol: Administrador
+Usuario: desp  | Contraseña: 1234 | Rol: Despachador
+Usuario: cond  | Contraseña: 1234 | Rol: Conductor  | Vehiculo CRC-001
+Usuario: cond2 | Contraseña: 1234 | Rol: Conductor  | Vehiculo MOT-045
+
+Placas registradas para el cliente vehiculo: CRC-001 y MOT-045

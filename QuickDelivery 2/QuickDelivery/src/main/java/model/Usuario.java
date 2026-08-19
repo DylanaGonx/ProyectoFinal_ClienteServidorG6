@@ -10,10 +10,11 @@ package model;
  */
 public class Usuario {
     // Datos del usuario
+    private int id;
     private String usuario;
     private String contrasenia;
     private String rol;
-    
+
     //Constructor
     public Usuario(String usuario, String contrasenia, String rol) {
         this.usuario = usuario;
@@ -22,6 +23,14 @@ public class Usuario {
     }
 
     // getters y setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getUsuario() {
         return usuario;
     }

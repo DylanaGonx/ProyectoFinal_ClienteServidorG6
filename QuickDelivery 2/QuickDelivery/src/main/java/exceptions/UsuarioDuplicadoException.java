@@ -9,7 +9,7 @@ package exceptions;
  * @author Valeria
  */
 
-public class UsuarioDuplicadoException extends Exception {
+public class UsuarioDuplicadoException extends QuickDeliveryException {
 
     public UsuarioDuplicadoException(String mensaje) {
         super(mensaje);

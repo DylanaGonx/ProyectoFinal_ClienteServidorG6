@@ -8,7 +8,7 @@ package exceptions;
  *
  * @author ssanc
  */
-public class VehiculoDuplicadoException extends Exception{
+public class VehiculoDuplicadoException extends QuickDeliveryException {
     
     // Constructor de la excepcion
     public VehiculoDuplicadoException(String message) {

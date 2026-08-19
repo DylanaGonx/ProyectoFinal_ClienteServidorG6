@@ -4,7 +4,9 @@
  */
 package ui;
 
+import exceptions.DatosInvalidosException;
 import exceptions.PaqueteDuplicadoException;
+import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import model.Vehiculo;
 import model.Paquete;
@@ -14,8 +16,10 @@ import model.EstadoPaquete;
  * @author ssanc
  */
 public class PaqueteDialog extends javax.swing.JDialog {
-    
-    
+
+    // Opcion del combo para dejar el paquete sin vehiculo
+    private static final String SIN_VEHICULO = "(Sin asignar)";
+
     private Principal principal;
     private Paquete paqueteEditar;
     private boolean editar = false;
@@ -49,24 +53,45 @@ public class PaqueteDialog extends javax.swing.JDialog {
         cargarVehiculos();
         
         //Enseña los datos del paquete
+        paqueteEditar = paquete;
+
         txtId.setText(String.valueOf(paquete.getId()));
         txtId.setEnabled(false);
         txtDestinatario.setText(paquete.getDestinatario());
         txtDireccion.setText(paquete.getDireccion());
         txtPeso.setText(String.valueOf(paquete.getPeso()));
         cbEstado.setSelectedItem(paquete.getEstado().toString());
-        
+
         if (paquete.getVehiculo() != null) {
             cbVehiculo.setSelectedItem(paquete.getVehiculo().getPlaca());
-            
+        } else {
+            cbVehiculo.setSelectedItem(SIN_VEHICULO);
         }
-        
+
     }
-    // Agregue los vehiculos al ComboBox
-    private void cargarVehiculos(){
+
+    /*
+     * Llena el combo con las placas registradas en la base de datos.
+     * La primera opcion siempre es "sin asignar", asi el combo nunca queda
+     * vacio aunque todavia no haya vehiculos en la flota.
+     */
+    private void cargarVehiculos() {
+
         cbVehiculo.removeAllItems();
-        for(Vehiculo vehiculo : principal.getGestorVehiculos().obtenerVehiculos()){
-            cbVehiculo.addItem(vehiculo.getPlaca());
+        cbVehiculo.addItem(SIN_VEHICULO);
+
+        try {
+
+            for (Vehiculo vehiculo : principal.getGestorVehiculos().obtenerVehiculos()) {
+                cbVehiculo.addItem(vehiculo.getPlaca());
+            }
+
+        } catch (SQLException ex) {
+
+            JOptionPane.showMessageDialog(this,
+                    "No se pudo cargar la flota.\n" + ex.getLocalizedMessage(),
+                    "Error de base de datos",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -227,92 +252,78 @@ public class PaqueteDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        
+
         //Revisa que todos los campos esten completos
-        if(txtId.getText().isEmpty()
+        if (txtId.getText().isEmpty()
                 || txtDestinatario.getText().isEmpty()
                 || txtDireccion.getText().isEmpty()
-                || txtPeso.getText().isEmpty()){
+                || txtPeso.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Debe completar todos los campos.");
             return;
         }
-        
-        Vehiculo vehiculo = principal.getGestorVehiculos().buscarVehiculo(cbVehiculo.getSelectedItem().toString());
-        EstadoPaquete estado = EstadoPaquete.valueOf(cbEstado.getSelectedItem().toString());
-        
-        // Crea el paquete
-        Paquete paquete = new Paquete(
-                Integer.parseInt(txtId.getText()),
-                txtDestinatario.getText(),
-                txtDireccion.getText(),
-                Double.parseDouble(txtPeso.getText()),
-                estado,
-                vehiculo);
+
         try {
-            
+
+            //El ID y el peso se convierten aqui, dentro del try, porque si el
+            //usuario digita letras se lanza NumberFormatException
+            int id = Integer.parseInt(txtId.getText().trim());
+            double peso = Double.parseDouble(txtPeso.getText().trim());
+
+            /*
+             * El vehiculo queda nulo cuando se escoge la opcion sin asignar.
+             * Antes se llamaba directo a getSelectedItem().toString() y eso
+             * reventaba cuando todavia no habia vehiculos registrados.
+             */
+            Vehiculo vehiculo = null;
+            Object seleccion = cbVehiculo.getSelectedItem();
+
+            if (seleccion != null && !seleccion.toString().equals(SIN_VEHICULO)) {
+                vehiculo = principal.getGestorVehiculos().buscarVehiculo(seleccion.toString());
+            }
+
+            EstadoPaquete estado = EstadoPaquete.valueOf(cbEstado.getSelectedItem().toString());
+
+            // Crea el paquete
+            Paquete paquete = new Paquete(
+                    id,
+                    txtDestinatario.getText(),
+                    txtDireccion.getText(),
+                    peso,
+                    estado,
+                    vehiculo);
+
             //Modifica o registra los paquetes
             if (editar) {
                 principal.getGestorPaquetes().modificarPaquete(paquete);
-            }else {
+                JOptionPane.showMessageDialog(this, "Paquete modificado correctamente");
+            } else {
                 principal.getGestorPaquetes().agregarPaquete(paquete);
+                JOptionPane.showMessageDialog(this, "Paquete registrado correctamente");
             }
-            
+
             //Actualiza la tabla
             principal.actualizarTabla();
-            
-            JOptionPane.showMessageDialog(this, "Paquete registrado correctamente");
-            
+
             //Cierra la ventana
             dispose();
-            
-        }catch(PaqueteDuplicadoException ex) {
-            
+
+        } catch (NumberFormatException ex) {
+
+            JOptionPane.showMessageDialog(this,
+                    "El ID y el peso tienen que ser valores numericos.");
+
+        } catch (PaqueteDuplicadoException | DatosInvalidosException ex) {
+
             JOptionPane.showMessageDialog(this, ex.getMessage());
-            
+
+        } catch (SQLException ex) {
+
+            JOptionPane.showMessageDialog(this,
+                    "No se pudo guardar el paquete.\n" + ex.getLocalizedMessage(),
+                    "Error de base de datos",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnGuardarActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(PaqueteDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(PaqueteDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(PaqueteDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(PaqueteDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                PaqueteDialog dialog = new PaqueteDialog(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;

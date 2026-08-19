@@ -8,7 +8,7 @@ package exceptions;
  *
  * @author ssanc
  */
-public class PaqueteDuplicadoException extends Exception{
+public class PaqueteDuplicadoException extends QuickDeliveryException {
     
     // Constructor de la excepcion
     public PaqueteDuplicadoException(String message) {

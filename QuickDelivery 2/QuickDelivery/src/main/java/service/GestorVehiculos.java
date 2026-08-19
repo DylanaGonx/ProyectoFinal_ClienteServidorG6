@@ -4,78 +4,79 @@
  */
 package service;
 
-import java.util.ArrayList;
-import model.Vehiculo;
+import dao.VehiculoDAO;
 import exceptions.VehiculoDuplicadoException;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import model.Vehiculo;
+
 /**
+ * Logica de negocio de la flota. La informacion se guarda en la base de datos
+ * por medio de VehiculoDAO.
  *
  * @author ssanc
  */
 public class GestorVehiculos {
-    
-    //Lista de los vehiculos registrados
-    private ArrayList<Vehiculo> listaVehiculos;
+
+    private VehiculoDAO vehiculoDAO;
+
     //Constructor
-    public GestorVehiculos(){
-        listaVehiculos = new ArrayList<>();
-        
+    public GestorVehiculos() {
+        vehiculoDAO = new VehiculoDAO();
     }
-    
+
     //Agrega un vehiculo
-    public void agregarVehiculo(Vehiculo vehiculo) throws VehiculoDuplicadoException {
+    public void agregarVehiculo(Vehiculo vehiculo) throws VehiculoDuplicadoException, SQLException {
 
         //Revisa si esa placa ya existe
-        for(Vehiculo v : listaVehiculos) {
-            if(vehiculo.getPlaca().equalsIgnoreCase(v.getPlaca())) {
-                throw new VehiculoDuplicadoException("Ya existe un vehiculo con esa placa.");
-            }
+        if (vehiculoDAO.obtenerPorPlaca(vehiculo.getPlaca()) != null) {
+            throw new VehiculoDuplicadoException("Ya existe un vehiculo con esa placa.");
         }
-        listaVehiculos.add(vehiculo);
-        
-        
+
+        vehiculoDAO.insertar(vehiculo);
     }
-        
-    
-    public ArrayList<Vehiculo> obtenerVehiculos() {
-        return listaVehiculos;
-        
+
+    public ArrayList<Vehiculo> obtenerVehiculos() throws SQLException {
+        return vehiculoDAO.listarTodos();
     }
+
+    //Vehiculos asignados a un conductor
+    public ArrayList<Vehiculo> obtenerVehiculosDeConductor(String usuario) throws SQLException {
+        return vehiculoDAO.listarPorConductor(usuario);
+    }
+
     //Busca los vehiculos por la placa
-    public Vehiculo buscarVehiculo(String placa) {
-        
-        for(Vehiculo vehiculo : listaVehiculos) {
-            
-            if(vehiculo.getPlaca().equalsIgnoreCase(placa)) {
-                return vehiculo;
-            }
-        }
-        return null;
-            
-        }
-    
-        //Eliminar un vehiculo por placa
-    public boolean eliminarVehiculo(String placa){
-         Vehiculo vehiculo = buscarVehiculo(placa);
-         
-         if(vehiculo != null){
-             listaVehiculos.remove(vehiculo);
-             return true;
-         }
-    return false;
+    public Vehiculo buscarVehiculo(String placa) throws SQLException {
+        return vehiculoDAO.obtenerPorPlaca(placa);
     }
-   
+
+    //Eliminar un vehiculo por placa
+    public boolean eliminarVehiculo(String placa) throws SQLException {
+
+        if (vehiculoDAO.obtenerPorPlaca(placa) == null) {
+            return false;
+        }
+
+        vehiculoDAO.eliminar(placa);
+        return true;
+    }
+
     //Modificar el vehiculo
-    public boolean modificarVehiculo(Vehiculo nuevoVehiculo){
-        Vehiculo vehiculo = buscarVehiculo(nuevoVehiculo.getPlaca());
-        
-        if (vehiculo != null){
-            vehiculo.setCapacidad(nuevoVehiculo.getCapacidad());
-            vehiculo.setConductor(nuevoVehiculo.getConductor());
-            
-          return true;
+    public boolean modificarVehiculo(Vehiculo nuevoVehiculo) throws SQLException {
+
+        if (vehiculoDAO.obtenerPorPlaca(nuevoVehiculo.getPlaca()) == null) {
+            return false;
         }
-        
-        return false;
+
+        vehiculoDAO.actualizar(nuevoVehiculo);
+        return true;
     }
+
+    //Cambia el estado del vehiculo cuando sale o regresa de una ruta
+    public void cambiarEstado(String placa, String nombreEstado) throws SQLException {
+        vehiculoDAO.actualizarEstado(placa, nombreEstado);
+    }
+
 }

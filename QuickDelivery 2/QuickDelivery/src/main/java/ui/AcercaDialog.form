@@ -24,18 +24,18 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="jScrollPane1" min="-2" pref="365" max="-2" attributes="0"/>
-              <EmptySpace pref="19" max="32767" attributes="0"/>
+              <EmptySpace pref="29" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
               <Component id="jScrollPane1" min="-2" pref="258" max="-2" attributes="0"/>
-              <EmptySpace pref="22" max="32767" attributes="0"/>
+              <EmptySpace pref="26" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -52,7 +52,7 @@
           <Properties>
             <Property name="columns" type="int" value="20"/>
             <Property name="rows" type="int" value="5"/>
-            <Property name="text" type="java.lang.String" value="Sistema de gesti&#xf3;n log&#xed;stica para el registro y monitoreo&#xa;de paquetes y veh&#xed;culos.&#xa;&#xa;Avance #2&#xa;Programacion Cliente/Servidor&#xa;&#xa;Sanchez Meneses Sebastian&#xa;Solis Picado Valeria&#xa;Gonzalez Diaz Dylana&#xa;Vargas Calderon Josel&#xa;"/>
+            <Property name="text" type="java.lang.String" value="Sistema Cliente/Servidor Concurrente para la Gesti&#xf3;n y Monitoreo de Entregas &#x2013; &#xa;QuickDelivery S.A.&#xa;&#xa;Avance #2&#xa;Programacion Cliente/Servidor&#xa;&#xa;Sanchez Meneses Sebastian&#xa;Solis Picado Valeria&#xa;Gonzalez Diaz Dylana&#xa;Vargas Calderon Josel&#xa;"/>
           </Properties>
         </Component>
       </SubComponents>

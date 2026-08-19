@@ -8,6 +8,14 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>17</maven.compiler.release>
-        <exec.mainClass>com.fidelitas.java.quickdelivery.QuickDelivery</exec.mainClass>
+        <exec.mainClass>com.fidelitas.java.quickdelivery.AplicacionServidor</exec.mainClass>
     </properties>
+    <!-- Conector JDBC de MySQL -->
+    <dependencies>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.33</version>
+        </dependency>
+    </dependencies>
 </project>

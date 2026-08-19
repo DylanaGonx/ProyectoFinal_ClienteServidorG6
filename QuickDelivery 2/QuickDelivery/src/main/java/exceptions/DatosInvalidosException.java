@@ -8,7 +8,7 @@ package exceptions;
  *
  * @author ssanc
  */
-public class DatosInvalidosException extends Exception{
+public class DatosInvalidosException extends QuickDeliveryException {
     
     // Constructor de la excepcion
     public DatosInvalidosException(String message) {

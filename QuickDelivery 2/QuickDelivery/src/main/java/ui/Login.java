@@ -4,11 +4,8 @@
  */
 package ui;
 
+import java.sql.SQLException;
 import javax.swing.JOptionPane;
-import exceptions.UsuarioDuplicadoException;
-import model.Administrador;
-import model.Conductor;
-import model.Despachador;
 import model.Usuario;
 import service.GestorLogin;
 import service.GestorUsuarios;
@@ -20,10 +17,15 @@ import service.GestorPaquetes;
  * @author ssanc
  */
 public class Login extends javax.swing.JFrame {
+
+    // El limite de intentos se lee del archivo de configuracion
+    private int maxIntentos;
+
     private GestorUsuarios gestorUsuarios;
     private GestorLogin gestorLogin;
     private GestorVehiculos gestorVehiculos;
     private GestorPaquetes gestorPaquetes;
+    private int intentos = 0;
 
     
     /**
@@ -32,36 +34,23 @@ public class Login extends javax.swing.JFrame {
     
     //Constructor
     public Login() {
-    initComponents();
-    setTitle("QuickDelivery");
-    setResizable(false);
-    setLocationRelativeTo(null);
+        initComponents();
+        setTitle("QuickDelivery");
+        setResizable(false);
+        setLocationRelativeTo(null);
 
-    gestorUsuarios = new GestorUsuarios();
-    gestorLogin = new GestorLogin(gestorUsuarios);
-    gestorVehiculos = new GestorVehiculos();
-    gestorPaquetes = new GestorPaquetes();
+        /*
+         * Los usuarios ya no se crean aqui: viven en la tabla usuarios de la
+         * base de datos y se validan contra ella al momento de ingresar.
+         */
+        gestorUsuarios = new GestorUsuarios();
+        gestorLogin = new GestorLogin();
+        gestorVehiculos = new GestorVehiculos();
+        gestorPaquetes = new GestorPaquetes();
 
-    try {
-
-        gestorUsuarios.agregarUsuario(
-                new Administrador("admin", "1234"));
-
-        gestorUsuarios.agregarUsuario(
-                new Despachador("desp", "1234"));
-
-        gestorUsuarios.agregarUsuario(
-                new Conductor("cond", "1234"));
-        
-
-    } catch (UsuarioDuplicadoException ex) {
-
-        JOptionPane.showMessageDialog(this,
-                ex.getMessage());
-
+        //Configuracion guardada con serializacion
+        maxIntentos = new service.GestorConfiguracion().cargarSeguro().getMaxIntentos();
     }
-
-}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -76,10 +65,11 @@ public class Login extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         lblTitulo = new javax.swing.JLabel();
+        lblLogo = new javax.swing.JLabel();
         lblUsuario = new javax.swing.JLabel();
         txtUsuario = new javax.swing.JTextField();
         lblContrasenia = new javax.swing.JLabel();
-        txtContrasenia = new javax.swing.JTextField();
+        txtContrasenia = new javax.swing.JPasswordField();
         jToolBar1 = new javax.swing.JToolBar();
         btnIngresar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
@@ -96,8 +86,10 @@ public class Login extends javax.swing.JFrame {
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Inicio de sesión"));
 
-        lblTitulo.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        lblTitulo.setText("Quick Delivery");
+        lblTitulo.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        lblTitulo.setText("Bienvenido al sistema");
+
+        lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/QuickDeliveryLogoGrande.png"))); // NOI18N
 
         lblUsuario.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lblUsuario.setText("Usuario:");
@@ -111,9 +103,10 @@ public class Login extends javax.swing.JFrame {
         lblContrasenia.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lblContrasenia.setText("Contraseña:");
 
+        jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
-        btnIngresar.setText("[ Ingresar ]");
+        btnIngresar.setText("Ingresar");
         btnIngresar.setFocusable(false);
         btnIngresar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnIngresar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -124,7 +117,7 @@ public class Login extends javax.swing.JFrame {
         });
         jToolBar1.add(btnIngresar);
 
-        btnCancelar.setText("[ Cancelar]");
+        btnCancelar.setText("Cancelar");
         btnCancelar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnCancelar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnCancelar.addActionListener(new java.awt.event.ActionListener() {
@@ -141,7 +134,10 @@ public class Login extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(80, 80, 80)
+                        .addGap(22, 22, 22)
+                        .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(110, 110, 110)
                         .addComponent(lblTitulo))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(22, 22, 22)
@@ -160,8 +156,10 @@ public class Login extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lblTitulo)
-                .addGap(50, 50, 50)
+                .addGap(30, 30, 30)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblUsuario))
@@ -204,69 +202,70 @@ public class Login extends javax.swing.JFrame {
     // El inicio de sesion
     private void btnIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIngresarActionPerformed
         String usuario = txtUsuario.getText();
-        String contrasenia = txtContrasenia.getText();
+        String contrasenia = new String(txtContrasenia.getPassword());
 
-        Usuario usuarioEncontrado =
-                gestorLogin.iniciarSesion(usuario, contrasenia);
+        if (usuario.isEmpty() || contrasenia.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Debe digitar el usuario y la contraseña.");
+            return;
+        }
 
-        if (usuarioEncontrado != null) {
+        try {
 
-            Principal principal = new Principal(gestorUsuarios,new GestorVehiculos(),new GestorPaquetes());
+            Usuario usuarioEncontrado = gestorLogin.iniciarSesion(usuario, contrasenia);
 
-principal.setVisible(true);
-dispose();
+            if (usuarioEncontrado != null) {
 
-        } else {
+                intentos = 0;
+
+                // El gestor necesita saber quien abrio la sesion para registrar
+                // al despachador responsable de cada asignacion
+                gestorPaquetes.setUsuarioSesion(usuarioEncontrado);
+
+                Principal principal = new Principal(
+                        usuarioEncontrado,
+                        gestorUsuarios,
+                        gestorVehiculos,
+                        gestorPaquetes);
+
+                principal.setVisible(true);
+                dispose();
+
+            } else {
+
+                intentos++;
+
+                // Limite de intentos, tal como aparece en el diagrama de clases
+                if (intentos >= maxIntentos) {
+
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Se alcanzo el limite de " + maxIntentos + " intentos. El sistema se va a cerrar.",
+                            "Acceso bloqueado",
+                            JOptionPane.ERROR_MESSAGE);
+
+                    System.exit(0);
+                }
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Usuario o contraseña incorrectos. Intento " + intentos + " de " + maxIntentos + ".",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+
+                txtContrasenia.setText("");
+                txtUsuario.requestFocus();
+            }
+
+        } catch (SQLException ex) {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Usuario o contraseña incorrectos.",
-                    "Error",
+                    "No se pudo conectar con la base de datos.\n" + ex.getLocalizedMessage(),
+                    "Error de conexion",
                     JOptionPane.ERROR_MESSAGE);
-
-            txtContrasenia.setText("");
-            txtUsuario.requestFocus();
-
-}
-        
-        
-        
-    }//GEN-LAST:event_btnIngresarActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
 
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            
-            public void run() {
-                new Login().setVisible(true);
-            }
-        });
-    }
+    }//GEN-LAST:event_btnIngresarActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
@@ -276,9 +275,10 @@ dispose();
     private javax.swing.JPanel jPanel1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JLabel lblContrasenia;
+    private javax.swing.JLabel lblLogo;
     private javax.swing.JLabel lblTitulo;
     private javax.swing.JLabel lblUsuario;
-    private javax.swing.JTextField txtContrasenia;
+    private javax.swing.JPasswordField txtContrasenia;
     private javax.swing.JTextField txtUsuario;
     // End of variables declaration//GEN-END:variables
 }
