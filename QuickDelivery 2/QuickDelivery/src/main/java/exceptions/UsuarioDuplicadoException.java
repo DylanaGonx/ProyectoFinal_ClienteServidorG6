@@ -5,8 +5,8 @@
 package exceptions;
 
 /**
- *
- * @author Valeria
+ * 
+ * @author Grupo 6
  */
 
 public class UsuarioDuplicadoException extends QuickDeliveryException {

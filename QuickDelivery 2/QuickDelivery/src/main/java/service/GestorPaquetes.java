@@ -16,10 +16,8 @@ import model.Paquete;
 import model.Usuario;
 
 /**
- * Logica de negocio de los paquetes. La informacion se guarda en la base de
- * datos por medio de PaqueteDAO.
- *
- * @author ssanc
+ * 
+ * @author Grupo 6
  */
 public class GestorPaquetes {
 

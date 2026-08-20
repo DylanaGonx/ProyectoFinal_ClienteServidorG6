@@ -13,12 +13,13 @@ import model.Paquete;
 import model.Usuario;
 import service.GestorIncidencias;
 import service.GestorLogin;
+import service.GestorUbicaciones;
 import service.GestorPaquetes;
 import service.GestorUsuarios;
 import service.GestorVehiculos;
 /**
- *
- * @author ssanc
+ * 
+ * @author Grupo 6
  */
 public class Principal extends javax.swing.JFrame {
 
@@ -31,6 +32,7 @@ public class Principal extends javax.swing.JFrame {
     private GestorUsuarios gestorUsuarios;
     private GestorLogin gestorLogin;
     private GestorIncidencias gestorIncidencias;
+    private GestorUbicaciones gestorUbicaciones;
 
     // Usuario que tiene la sesion abierta
     private Usuario usuarioSesion;
@@ -49,6 +51,7 @@ public class Principal extends javax.swing.JFrame {
         this.gestorPaquetes = gestorPaquetes;
         this.gestorLogin = new GestorLogin();
         this.gestorIncidencias = new GestorIncidencias();
+        this.gestorUbicaciones = new GestorUbicaciones();
 
         setTitle("Sistema de Logística - Monitor  [" + usuarioSesion.getUsuario()
                 + " - " + usuarioSesion.getrol() + "]");
@@ -79,7 +82,9 @@ public class Principal extends javax.swing.JFrame {
         boolean administrador = rol.equals("Administrador");
         boolean despachador = rol.equals("Despachador");
 
+        //RF-03 y RF-05: la administracion de usuarios y de la flota es del administrador
         btnRegistrarVehiculo.setEnabled(administrador);
+        btnGestionarUsuarios.setEnabled(administrador);
 
         btnRegistrarPaquete.setEnabled(administrador || despachador);
         btnEditarPaquete.setEnabled(administrador || despachador);
@@ -310,6 +315,29 @@ public class Principal extends javax.swing.JFrame {
             }
         }
 
+        /*
+         * Ubicacion que va reportando la flota. Este bloque se refresca solo,
+         * junto con el resto del monitor, cada SEGUNDOS_REFRESCO: en cuanto un
+         * conductor manda su posicion, al administrador y al despachador se
+         * les actualiza sin que tengan que hacer nada.
+         */
+        try {
+
+            ArrayList<String> ubicacionesFlota = gestorUbicaciones.obtenerUbicacionesFlota();
+
+            if (!ubicacionesFlota.isEmpty()) {
+
+                alertas.append("--- Ubicacion de la flota en ruta ---\n");
+
+                for (String ubicacion : ubicacionesFlota) {
+                    alertas.append(ubicacion).append("\n");
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("No se pudo consultar la ubicacion de la flota: " + ex.getLocalizedMessage());
+        }
+
         try {
 
             for (String incidencia : gestorIncidencias.obtenerIncidencias()) {
@@ -357,6 +385,7 @@ public class Principal extends javax.swing.JFrame {
         lblValAvance = new javax.swing.JLabel();
         jToolBar1 = new javax.swing.JToolBar();
         btnRegistrarVehiculo = new javax.swing.JButton();
+        btnGestionarUsuarios = new javax.swing.JButton();
         btnRegistrarPaquete = new javax.swing.JButton();
         btnEditarPaquete = new javax.swing.JButton();
         btnRegistrarIncidencia = new javax.swing.JButton();
@@ -487,13 +516,24 @@ public class Principal extends javax.swing.JFrame {
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
-        btnRegistrarVehiculo.setText("Registrar Vehículo");
+        btnRegistrarVehiculo.setText("Gestionar Vehículos");
         btnRegistrarVehiculo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRegistrarVehiculoActionPerformed(evt);
             }
         });
         jToolBar1.add(btnRegistrarVehiculo);
+
+        btnGestionarUsuarios.setText("Gestionar Usuarios");
+        btnGestionarUsuarios.setFocusable(false);
+        btnGestionarUsuarios.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnGestionarUsuarios.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnGestionarUsuarios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGestionarUsuariosActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnGestionarUsuarios);
 
         btnRegistrarPaquete.setText("Registrar Paquete");
         btnRegistrarPaquete.addActionListener(new java.awt.event.ActionListener() {
@@ -693,7 +733,7 @@ public class Principal extends javax.swing.JFrame {
 
     //Abre la ventana del registro del vehiculo
     private void btnRegistrarVehiculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarVehiculoActionPerformed
-        VehiculoDialog dialog = new VehiculoDialog(this, true);
+        GestionVehiculos dialog = new GestionVehiculos(this, true);
         dialog.setVisible(true);
     }//GEN-LAST:event_btnRegistrarVehiculoActionPerformed
 
@@ -717,6 +757,11 @@ public class Principal extends javax.swing.JFrame {
                             .append(paquete.getId())
                             .append(" está pendiente de entrega.\n");
                 }
+            }
+
+            //Ubicacion de la flota en ruta, la misma que ve el conductor en su vehiculo
+            for (String ubicacion : gestorUbicaciones.obtenerUbicacionesFlota()) {
+                alertas.append("- Ubicación: ").append(ubicacion).append("\n");
             }
 
             //Incidencias que reportaron los conductores desde el cliente vehiculo
@@ -846,6 +891,15 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_btnRegistrarIncidenciaActionPerformed
 
     /*
+     * Abre la administracion de usuarios (RF-03): registrar, consultar,
+     * modificar y dar de baja.
+     */
+    private void btnGestionarUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGestionarUsuariosActionPerformed
+        GestionUsuarios dialog = new GestionUsuarios(this, true, usuarioSesion);
+        dialog.setVisible(true);
+    }//GEN-LAST:event_btnGestionarUsuariosActionPerformed
+
+    /*
      * Abre la ventana donde el conductor reporta su ubicacion (RF-12).
      * Cada envio queda como una fila nueva en ubicaciones_vehiculo.
      */
@@ -886,32 +940,12 @@ public class Principal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnEliminarPaqueteActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-
-    /*
-     * El monitor ya no se abre directo porque necesita saber que usuario
-     * inicio sesion. La entrada del sistema es la ventana de Login.
-     */
-    java.awt.EventQueue.invokeLater(new Runnable() {
-
-        public void run() {
-
-            new Login().setVisible(true);
-
-        }
-
-    });
-
-}
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCerrarSesion;
     private javax.swing.JButton btnEditarPaquete;
     private javax.swing.JButton btnEliminarPaquete;
     private javax.swing.JButton btnEnviarUbicacion;
+    private javax.swing.JButton btnGestionarUsuarios;
     private javax.swing.JButton btnRegistrarIncidencia;
     private javax.swing.JButton btnRegistrarPaquete;
     private javax.swing.JButton btnRegistrarVehiculo;

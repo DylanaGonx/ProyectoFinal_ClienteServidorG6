@@ -121,7 +121,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Segoe UI" size="14" style="0"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Vehículo:"/>
+            <Property name="text" type="java.lang.String" value="Veh&#xed;culo:"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="lblValVehiculo">
@@ -150,7 +150,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Segoe UI" size="14" style="0"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Descripción:"/>
+            <Property name="text" type="java.lang.String" value="Descripci&#xf3;n:"/>
           </Properties>
         </Component>
         <Container class="javax.swing.JScrollPane" name="jScrollPane1">
@@ -172,7 +172,6 @@
         </Container>
         <Container class="javax.swing.JToolBar" name="jToolBar1">
           <Properties>
-            <Property name="floatable" type="boolean" value="false"/>
             <Property name="rollover" type="boolean" value="true"/>
           </Properties>
 

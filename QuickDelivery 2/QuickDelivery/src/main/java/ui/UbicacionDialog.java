@@ -12,15 +12,7 @@ import service.GestorUbicaciones;
 import service.GestorVehiculos;
 
 /**
- * Ventana para que el conductor reporte su ubicacion desde el sistema (RF-12).
- *
- * Las coordenadas se digitan planas, en dos campos: latitud y longitud. Cada
- * envio agrega una fila nueva en ubicaciones_vehiculo, de manera que queda el
- * historico del recorrido y no solo la ultima posicion.
- *
- * La ventana se queda abierta despues de enviar, para que el conductor pueda
- * mandar varios reportes seguidos mientras avanza en la ruta.
- *
+ * 
  * @author Grupo 6
  */
 public class UbicacionDialog extends javax.swing.JDialog {

@@ -8,12 +8,12 @@ package model;
  * 
  * @author Grupo 6
  */
-public class Despachador extends Usuario{
+public interface Monitoreable {
 
-    public Despachador(String usuario, String contrasenia){
+    //Guarda la ultima posicion reportada
+    void actualizarUbicacion(double latitud, double longitud);
 
-        super(usuario, contrasenia, "Despachador");
-
-    }
+    //Devuelve como esta el objeto en este momento, listo para mostrar
+    String obtenerEstado();
 
 }

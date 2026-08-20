@@ -1,2 +1,12 @@
 2026-08-09 16:26:35 | admin | LOGIN | Seguridad | Inicio de sesion del usuario admin
 2026-08-09 16:27:15 | admin | LOGOUT | Seguridad | Cierre de sesion del usuario admin
+2026-08-11 18:20:53 | admin | LOGIN | Seguridad | Inicio de sesion del usuario admin
+2026-08-19 18:53:14 | admin | LOGIN | Seguridad | Inicio de sesion del usuario admin
+2026-08-19 19:13:30 | admin | LOGOUT | Seguridad | Cierre de sesion del usuario admin
+2026-08-19 19:28:51 | admin | LOGIN | Seguridad | Inicio de sesion del usuario admin
+2026-08-19 19:43:21 | admin | LOGOUT | Seguridad | Cierre de sesion del usuario admin
+2026-08-19 19:59:48 | admin | LOGIN | Seguridad | Inicio de sesion del usuario admin
+2026-08-19 20:05:18 | admin | LOGOUT | Seguridad | Cierre de sesion del usuario admin
+2026-08-19 20:23:30 | admin | LOGIN | Seguridad | Inicio de sesion del usuario admin
+2026-08-19 20:24:25 | admin | LOGOUT | Seguridad | Cierre de sesion del usuario admin
+2026-08-19 20:24:33 | cond | LOGIN | Seguridad | Inicio de sesion del usuario cond

@@ -11,9 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * Acceso a la tabla logs_sistema. Guarda la auditoria de lo que hace cada
- * usuario dentro del sistema.
- *
+ * 
  * @author Grupo 6
  */
 public class LogDAO {

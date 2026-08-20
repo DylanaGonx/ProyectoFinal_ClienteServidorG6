@@ -5,8 +5,8 @@
 package exceptions;
 
 /**
- *
- * @author ssanc
+ * 
+ * @author Grupo 6
  */
 public class VehiculoDuplicadoException extends QuickDeliveryException {
     

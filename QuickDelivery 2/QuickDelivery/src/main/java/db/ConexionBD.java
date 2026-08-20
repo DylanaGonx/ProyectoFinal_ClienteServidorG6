@@ -9,8 +9,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Clase encargada de entregar la conexion a la base de datos quick_delivery.
- *
+ * 
  * @author Grupo 6
  */
 public class ConexionBD {

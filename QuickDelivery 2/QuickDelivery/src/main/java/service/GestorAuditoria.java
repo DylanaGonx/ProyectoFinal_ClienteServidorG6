@@ -18,16 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * Auditoria del sistema.
- *
- * Cada movimiento queda anotado en dos lugares a la vez:
- *
- *   1. En la tabla logs_sistema de la base de datos, por medio de LogDAO
- *   2. En el archivo bitacora.dat, que queda en la carpeta del proyecto
- *
- * El archivo sirve de respaldo: si la base de datos esta caida, el movimiento
- * igual queda anotado y despues se puede revisar.
- *
+ * 
  * @author Grupo 6
  */
 public class GestorAuditoria {

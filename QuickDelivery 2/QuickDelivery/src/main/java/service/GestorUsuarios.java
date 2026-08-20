@@ -13,10 +13,8 @@ import java.util.ArrayList;
 import model.Usuario;
 
 /**
- * Logica de negocio de los usuarios. La informacion se guarda en la base de
- * datos por medio de UsuarioDAO.
- *
- * @author Valeria
+ * 
+ * @author Grupo 6
  */
 public class GestorUsuarios {
 

@@ -22,8 +22,7 @@ import model.Motocicleta;
 import model.Vehiculo;
 
 /**
- * Acceso a la tabla vehiculos.
- *
+ * 
  * @author Grupo 6
  */
 public class VehiculoDAO {
