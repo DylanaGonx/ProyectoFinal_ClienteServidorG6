@@ -13,10 +13,8 @@ import java.util.ArrayList;
 import model.Vehiculo;
 
 /**
- * Logica de negocio de la flota. La informacion se guarda en la base de datos
- * por medio de VehiculoDAO.
- *
- * @author ssanc
+ * 
+ * @author Grupo 6
  */
 public class GestorVehiculos {
 

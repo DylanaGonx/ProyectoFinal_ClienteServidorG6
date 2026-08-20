@@ -11,9 +11,8 @@ import java.sql.SQLException;
 import model.Usuario;
 
 /**
- * Autenticacion de los usuarios del sistema (RF-01 y RF-02).
- *
- * @author Valeria
+ * 
+ * @author Grupo 6
  */
 public class GestorLogin {
 

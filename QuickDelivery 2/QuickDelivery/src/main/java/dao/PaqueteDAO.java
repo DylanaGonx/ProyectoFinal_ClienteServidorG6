@@ -19,9 +19,7 @@ import model.EstadoPaquete;
 import model.Paquete;
 
 /**
- * Acceso a la tabla paquetes y a las tablas relacionadas (direcciones y
- * asignaciones).
- *
+ * 
  * @author Grupo 6
  */
 public class PaqueteDAO {

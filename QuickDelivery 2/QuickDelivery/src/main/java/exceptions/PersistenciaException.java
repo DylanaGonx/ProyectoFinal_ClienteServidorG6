@@ -5,9 +5,7 @@
 package exceptions;
 
 /**
- * Se lanza cuando falla la lectura o la escritura de un archivo: la bitacora de
- * texto o el archivo de configuracion serializado.
- *
+ * 
  * @author Grupo 6
  */
 public class PersistenciaException extends QuickDeliveryException {

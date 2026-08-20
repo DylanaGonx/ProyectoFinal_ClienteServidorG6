@@ -20,8 +20,7 @@ import model.Despachador;
 import model.Usuario;
 
 /**
- * Acceso a la tabla usuarios.
- *
+ * 
  * @author Grupo 6
  */
 public class UsuarioDAO {
@@ -29,7 +28,9 @@ public class UsuarioDAO {
     /*
      * Registra el usuario. Se usa una transaccion porque ademas de la fila en
      * usuarios hay que crear la fila de la tabla especializada que corresponde
-     * al rol (administradores, conductores o despachadores).
+     * al rol, cuando ese rol guarda datos propios (conductores y
+     * despachadores). El administrador no lleva tabla aparte: ser administrador
+     * es un rol, y el rol ya quedo guardado en la fila de usuarios.
      */
     public void insertar(Usuario usuario) throws SQLException {
 
@@ -109,9 +110,6 @@ public class UsuarioDAO {
         String sql;
 
         switch (rol) {
-            case "Administrador":
-                sql = "INSERT INTO administradores (id_usuario, nivel) VALUES (?, 1)";
-                break;
             case "Conductor":
                 sql = "INSERT INTO conductores (id_usuario, licencia, telefono) VALUES (?, ?, '')";
                 break;
@@ -182,12 +180,16 @@ public class UsuarioDAO {
         }
     }
 
-    // Lista todos los usuarios registrados
+    /*
+     * Lista los usuarios activos. Los que se dieron de baja no aparecen, igual
+     * que pasa con los vehiculos inactivos en VehiculoDAO.
+     */
     public ArrayList<Usuario> listarTodos() throws SQLException {
 
         String sql = "SELECT u.id_usuario, u.usuario, u.contrasena_hash, r.nombre_rol "
                    + "FROM usuarios u "
                    + "INNER JOIN roles r ON r.id_rol = u.id_rol "
+                   + "WHERE u.activo = TRUE "
                    + "ORDER BY u.id_usuario";
 
         ArrayList<Usuario> usuarios = new ArrayList<>();
@@ -211,6 +213,7 @@ public class UsuarioDAO {
                    + "FROM usuarios u "
                    + "INNER JOIN roles r ON r.id_rol = u.id_rol "
                    + "INNER JOIN conductores c ON c.id_usuario = u.id_usuario "
+                   + "WHERE u.activo = TRUE "
                    + "ORDER BY u.usuario";
 
         ArrayList<Usuario> conductores = new ArrayList<>();

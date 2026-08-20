@@ -5,8 +5,8 @@
 package model;
 
 /**
- *
- * @author Valeria
+ * 
+ * @author Grupo 6
  */
 public class Conductor extends Usuario{
 

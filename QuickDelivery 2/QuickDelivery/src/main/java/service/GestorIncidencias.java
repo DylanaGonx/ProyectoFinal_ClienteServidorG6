@@ -11,8 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
- * Logica de negocio de las incidencias que reportan los conductores (HU-07).
- *
+ * 
  * @author Grupo 6
  */
 public class GestorIncidencias {
@@ -24,12 +23,27 @@ public class GestorIncidencias {
     }
 
     /*
-     * Registra la incidencia despues de revisar las condiciones que exige la
-     * tabla: el paquete tiene que ir en un vehiculo y ese vehiculo tiene que
-     * tener un conductor, porque la incidencia queda a nombre de el.
+     * Version para cuando la incidencia se anota desde el escritorio (el
+     * despachador o el administrador, con IncidenciaDialog). No hay GPS a la
+     * mano, asi que la ubicacion queda nula.
      */
     public void registrarIncidencia(int idPaquete, String placa, String tipo, String descripcion)
             throws DatosInvalidosException, SQLException {
+
+        registrarIncidencia(idPaquete, placa, tipo, descripcion, null, null);
+    }
+
+    /*
+     * Registra la incidencia despues de revisar las condiciones que exige la
+     * tabla: el paquete tiene que ir en un vehiculo y ese vehiculo tiene que
+     * tener un conductor, porque la incidencia queda a nombre de el.
+     *
+     * Esta version si recibe la ubicacion: la usa el conductor cuando reporta
+     * la incidencia desde el cliente vehiculo, con la posicion real del GPS en
+     * ese momento (RF-12 aplicado tambien a las incidencias).
+     */
+    public void registrarIncidencia(int idPaquete, String placa, String tipo, String descripcion,
+            Double latitud, Double longitud) throws DatosInvalidosException, SQLException {
 
         if (placa == null || placa.trim().isEmpty()) {
             throw new DatosInvalidosException(
@@ -46,7 +60,7 @@ public class GestorIncidencias {
                     + "por eso no se le puede registrar la incidencia a nadie.");
         }
 
-        incidenciaDAO.insertar(idPaquete, placa, tipo, descripcion.trim());
+        incidenciaDAO.insertar(idPaquete, placa, tipo, descripcion.trim(), latitud, longitud);
     }
 
     public ArrayList<String> obtenerIncidencias() throws SQLException {

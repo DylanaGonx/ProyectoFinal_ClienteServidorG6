@@ -5,8 +5,8 @@
 package model;
 
 /**
- *
- * @author ssanc
+ * 
+ * @author Grupo 6
  */
 public class Furgon extends Vehiculo {
     

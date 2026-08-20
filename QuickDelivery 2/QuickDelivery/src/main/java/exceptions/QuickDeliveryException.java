@@ -5,16 +5,7 @@
 package exceptions;
 
 /**
- * Excepcion base de todo el sistema QuickDelivery.
- *
- * De ella heredan las demas excepciones propias del proyecto. Sirve para poder
- * atrapar de un solo golpe cualquier error del negocio:
- *
- *     catch (QuickDeliveryException ex) { ... }
- *
- * y tambien para distinguirlos de los errores tecnicos como SQLException o
- * IOException, que se manejan aparte.
- *
+ * 
  * @author Grupo 6
  */
 public class QuickDeliveryException extends Exception {

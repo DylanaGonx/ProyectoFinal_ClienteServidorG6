@@ -7,12 +7,7 @@ package model;
 import java.io.Serializable;
 
 /**
- * Configuracion del sistema. Este objeto se guarda y se lee de un archivo
- * usando serializacion, por eso implementa Serializable.
- *
- * Ahi se guarda la direccion del servidor, el puerto y cada cuanto reporta el
- * conductor su ubicacion, para no tener esos valores quemados en el codigo.
- *
+ * 
  * @author Grupo 6
  */
 public class Configuracion implements Serializable {

@@ -16,11 +16,7 @@ import java.io.ObjectOutputStream;
 import model.Configuracion;
 
 /**
- * Guarda y lee el objeto Configuracion de un archivo, usando serializacion.
- *
- * El archivo queda en la carpeta del proyecto con el nombre configuracion.dat.
- * Si todavia no existe, se crea con los valores por defecto.
- *
+ * 
  * @author Grupo 6
  */
 public class GestorConfiguracion {

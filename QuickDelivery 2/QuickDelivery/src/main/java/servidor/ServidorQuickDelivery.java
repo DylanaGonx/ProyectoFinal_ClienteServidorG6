@@ -6,40 +6,55 @@ package servidor;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
- * Servidor concurrente de QuickDelivery.
- *
- * Se queda esperando conexiones y por cada conductor que entra levanta un hilo
- * ManejadorConductor, de manera que varios vehiculos pueden estar reportando su
- * ubicacion al mismo tiempo sin bloquearse entre ellos.
- *
- * Se ejecuta con la clase servidor.ServidorQuickDelivery como clase principal.
- *
+ * 
  * @author Grupo 6
  */
 public class ServidorQuickDelivery {
 
     public static final int PUERTO = 5433;
 
-    public static void main(String[] args) {
+    // Cantidad de conductores que se pueden atender a la vez
+    public static final int MAX_CONDUCTORES = 20;
+
+    private ServerSocket servidor;
+    private ExecutorService ejecutor;
+
+    /*
+     * Abre el puerto y se queda atendiendo. Este metodo no devuelve el control
+     * hasta que el servidor se detenga, por eso quien lo llama lo hace desde un
+     * hilo aparte.
+     */
+    public void iniciar() {
+
+        //Grupo de hilos: se crean de una vez y se reutilizan
+        ejecutor = Executors.newFixedThreadPool(MAX_CONDUCTORES);
 
         try {
 
-            System.out.println("Servidor QuickDelivery iniciado en el puerto " + PUERTO + ".");
+            servidor = new ServerSocket(PUERTO);
 
-            ServerSocket servidor = new ServerSocket(PUERTO);
+            System.out.println("Servidor QuickDelivery iniciado en el puerto " + PUERTO + ".");
+            System.out.println("Capacidad: " + MAX_CONDUCTORES + " conductores a la vez.");
 
             while (true) {
 
-                // accept() devuelve el socket del conductor que se acaba de
-                // conectar y de una vez se le asigna su propio hilo
-                ManejadorConductor manejador = new ManejadorConductor(servidor.accept());
-                manejador.start();
+                /*
+                 * accept() devuelve el socket del conductor que se acaba de
+                 * conectar y se le entrega al grupo de hilos. El ejecutor
+                 * decide cual hilo lo atiende.
+                 */
+                ejecutor.execute(new ManejadorConductor(servidor.accept()));
             }
 
         } catch (IOException ex) {
-            System.out.println("Error: " + ex.toString());
+            System.out.println("Error del servidor: " + ex.toString());
+
+        } finally {
+            ejecutor.shutdown();
         }
     }
 

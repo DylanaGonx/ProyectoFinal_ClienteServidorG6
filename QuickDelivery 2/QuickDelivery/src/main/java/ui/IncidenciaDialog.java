@@ -11,12 +11,7 @@ import model.Paquete;
 import service.GestorIncidencias;
 
 /**
- * Ventana para registrar una incidencia de un paquete (HU-07).
- *
- * El paquete y el vehiculo se muestran solo de lectura porque vienen de la fila
- * que se escogio en el monitor. Los tipos de incidencia se cargan de la tabla
- * tipos_incidencia, no van quemados en el codigo.
- *
+ * 
  * @author Grupo 6
  */
 public class IncidenciaDialog extends javax.swing.JDialog {
